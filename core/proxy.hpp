@@ -320,7 +320,7 @@ public:
         end = timer::get_usec();
         logstream(LOG_INFO) << "Parsing time: " << (end - start) << " usec" << LOG_endl;
         request.mt_factor = min(mt_factor, Global::mt_threshold);
-        request.pattern_group.print_group();
+        // request.pattern_group.print_group();
 
         // Generate query plan if SPARQL optimizer is enabled.
         // FIXME: currently, the optimizater only works for standard SPARQL query.
@@ -344,7 +344,7 @@ public:
         }
 
         request.pattern_group.print_group();
-        planner.run_single_path(request, true);
+        // planner.run_single_path(request, true);
 
         // Print a WARNING to enable multi-threading for potential (heavy) query
         // TODO: optimizer could recognize the real heavy query
@@ -413,7 +413,7 @@ public:
             write_cost /= Global::num_servers;
             read_cost /= Global::num_servers;
         }
-        logstream(LOG_INFO) << "real network read cost: " << read_cost
+        logstream(LOG_DEBUG) << "real network read cost: " << read_cost
                             << " write cost: " << write_cost << " all cost: " << (read_cost+write_cost)
                             << " usec / per server" << LOG_endl;
 
@@ -698,6 +698,7 @@ public:
             data_send = data_send + data_send;
         }
         data_send = "";
+        planner.cost_model.print_network();
 
         CostBenchmk reply;
         for (int i = 0; i < stypes.size(); i++) {
@@ -725,7 +726,7 @@ public:
                 i, reply.row_k2u_init, reply.row_k2u_prune, reply.row_k2u,
                 reply.row_k2l, reply.latency_k2l);
         }
-        planner.cost_model.generate_factor();
+
         vector<ssid_t> tps;
         int clockwise_count = 0;
         if (stats->get_circle_pattern(tps, clockwise_count, circle_num) == 0) {
@@ -763,7 +764,6 @@ public:
         }
         planner.cost_model.resize(real_count, model_t::K2K);
         planner.cost_model.generate_factor(model_t::K2K);
-        planner.cost_model.print_network();
     }
 
     
